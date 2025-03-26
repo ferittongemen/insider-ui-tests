@@ -8,7 +8,7 @@ from .base_page import BasePage
 class CareersPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
-        self.locations_xpath = "//*[@id='career-our-location']/div/div/div/div[1]"
+        self.LOCATIONS_XPATH = "//*[@id='career-our-location']/div/div/div/div[1]"
         self.teams_xpath = "//*[@id='career-find-our-calling']/div/div/a"
         self.life_at_insider_xpath = "//h2[contains(text(), 'Life at Insider')]"
         self.see_all_teams_xpath = "//a[contains(text(), 'See all teams')]"
@@ -29,7 +29,7 @@ class CareersPage(BasePage):
         """Locations, Teams ve Life at Insider bölümlerinin yüklenmesini bekler ve doğrular."""
         try:
             print("🔄 Bekleniyor: Locations bölümü...")
-            self.wait_for_element(By.XPATH, self.locations_xpath)
+            self.wait_for_element(By.XPATH, self.LOCATIONS_XPATH)
             print("✅ Locations bölümü bulundu!")
 
             print("🔄 Bekleniyor: Teams bölümü...")
