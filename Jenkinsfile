@@ -36,7 +36,6 @@ pipeline {
     post {
         always {
             archiveArtifacts artifacts: '**/screenshots/*.png', fingerprint: true
-            junit 'allure-results/*.xml'
         }
     }
 }
