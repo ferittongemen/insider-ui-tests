@@ -35,7 +35,18 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: '**/screenshots/*.png', fingerprint: true, allowEmptyArchive: true
+            echo "🔍 Searching for screenshots to archive..."
+            sh 'find . -name "*.png" || true'
+
+            script {
+                def screenshotFiles = findFiles(glob: '**/screenshots/*.png')
+                if (screenshotFiles.length > 0) {
+                    echo "📁 Screenshot(s) found: Archiving..."
+                    archiveArtifacts artifacts: '**/screenshots/*.png', fingerprint: true
+                } else {
+                    echo "✅ No screenshots found, skipping artifact step without marking unstable."
+                }
+            }
         }
     }
 }
