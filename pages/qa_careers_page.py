@@ -129,16 +129,13 @@ class QACareersPage(BasePage):
                     print(f"⚠️ {attempt + 1}. denemede hata: {e}")
                     time.sleep(1)
 
-            # Yeni sekmeye geç
             windows = self.driver.window_handles
             if len(windows) > 1:
                 self.driver.switch_to.window(windows[1])
-                self.wait_for_page_to_load()
-                current_url = self.driver.current_url
-                print("🌐 View Role sayfası URL:", current_url)
-                return "lever.co" in current_url
+                print("🔄 Yeni sekmeye geçildi:", self.driver.current_url)
 
-            return False
+            self.wait_for_page_to_load()
+            return "lever.co" in self.driver.current_url
 
         except Exception as e:
             print(f"❌ View Role genel hata: {e}")

@@ -62,5 +62,5 @@ def test_insider_career_page(driver):
     print("✅ View Role butonu kontrol ediliyor...")
     assert qa_careers_page.verify_view_role_redirects(), "❌ Hata: View Role butonu yönlendirmiyor!"
 
-    print("🌐 Son URL:", driver.current_url)
     print("🎉 Tüm testler başarıyla tamamlandı!")
+    print("🌐 Son URL:", driver.current_url)
