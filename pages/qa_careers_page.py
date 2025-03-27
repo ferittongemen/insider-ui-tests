@@ -118,29 +118,29 @@ class QACareersPage(BasePage):
             print("✅ Pozisyon kartları yüklendi.")
 
             self.scroll_to_element(By.XPATH, self.view_role_button_xpath)
-            view_role_button = self.wait_for_element_to_be_clickable(By.XPATH, self.view_role_button_xpath, timeout=10)
+            view_role_buttons = self.driver.find_elements(By.XPATH, self.view_role_button_xpath)
 
-            if view_role_button:
+            if view_role_buttons:
+                view_role_button = view_role_buttons[0]
                 try:
                     print("✅ Görünür hale gelen View Role butonuna tıklanıyor...")
                     view_role_button.click()
                 except Exception as e:
                     print(f"⚠️ Normal tıklama başarısız: {e}, JavaScript ile tıklanıyor...")
                     self.driver.execute_script("arguments[0].click();", view_role_button)
-
-                self.wait_for_page_to_load()
-
-                windows = self.driver.window_handles
-                if len(windows) > 1:
-                    self.driver.switch_to.window(windows[1])
-                    print("🔄 Yeni sekmeye geçildi:", self.driver.current_url)
-
-                self.wait_for_page_to_load()
-                return "lever.co" in self.driver.current_url
-
             else:
-                print("❌ HATA: View Role butonu tıklanabilir değil.")
+                print("❌ HATA: View Role butonu DOM'da bulunamadı.")
                 return False
+
+            self.wait_for_page_to_load()
+
+            windows = self.driver.window_handles
+            if len(windows) > 1:
+                self.driver.switch_to.window(windows[1])
+                print("🔄 Yeni sekmeye geçildi:", self.driver.current_url)
+
+            self.wait_for_page_to_load()
+            return "lever.co" in self.driver.current_url
 
         except Exception as e:
             print(f"❌ View Role butonuna tıklanırken hata oluştu: {e}")
