@@ -17,13 +17,17 @@ class CareersPage(BasePage):
         self.qa_open_positions_xpath = "//h3[contains(text(), 'Quality Assurance')]/following-sibling::a[contains(text(), 'Open Positions')]"
 
     def is_accessible(self):
-        title = self.driver.title.lower()
-        url = self.driver.current_url.lower()
-
-        print(f"📄 Careers Sayfa Başlığı: {self.driver.title}")
-        print(f"🌐 Careers Sayfa URL: {self.driver.current_url}")
-
-        return "careers" in title or "/careers" in url
+        try:
+            print("🔍 QA sayfasının başlığı kontrol ediliyor...")
+            self.wait_for_page_to_load()
+            title = self.driver.title.lower()
+            url = self.driver.current_url.lower()
+            print(f"📄 QA Sayfa Başlığı: {title}")
+            print(f"🌐 QA Sayfa URL: {url}")
+            return "careers" in title or "quality assurance" in title or "/careers" in url
+        except Exception as e:
+            print(f"❌ QA sayfası erişim kontrolü sırasında hata: {e}")
+            return False
 
     def verify_sections(self):
         """Locations, Teams ve Life at Insider bölümlerinin yüklenmesini bekler ve doğrular."""
