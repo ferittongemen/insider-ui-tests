@@ -124,8 +124,8 @@ class QACareersPage(BasePage):
                 try:
                     print("✅ Görünür hale gelen View Role butonuna tıklanıyor...")
                     view_role_button.click()
-                except Exception:
-                    print("⚠️ Normal tıklama başarısız, JavaScript ile tıklanıyor...")
+                except Exception as e:
+                    print(f"⚠️ Normal tıklama başarısız: {e}, JavaScript ile tıklanıyor...")
                     self.driver.execute_script("arguments[0].click();", view_role_button)
 
                 self.wait_for_page_to_load()
@@ -143,7 +143,7 @@ class QACareersPage(BasePage):
                 return False
 
         except Exception as e:
-            print(f"❌ View Role butonuna tıklanırken hata: {e}")
+            print(f"❌ View Role butonuna tıklanırken hata oluştu: {e}")
             return False
 
     def click_see_all_qa_jobs(self):
