@@ -21,7 +21,22 @@ class QACareersPage(BasePage):
         try:
             print("🔍 QA sayfasının başlığı kontrol ediliyor...")
             self.wait_for_page_to_load()
-            self.wait_for_element(By.XPATH, self.view_role_button_xpath)
+
+            # QA başlığının geldiğinden emin ol
+            qa_header_xpath = "//h3[contains(text(), 'Quality Assurance')]"
+            WebDriverWait(self.driver, 10).until(
+                EC.presence_of_element_located((By.XPATH, qa_header_xpath))
+            )
+
+            # Eski job kartları kaybolmuş ve yenileri gelmiş mi kontrol et
+            self.wait_for_job_cards_to_be_replaced()
+
+            # En az bir View Role butonu var mı?
+            view_roles = self.driver.find_elements(By.XPATH, self.view_role_button_xpath)
+            if not view_roles:
+                print("⚠️ View Role butonları sayfada bulunamadı.")
+                return False
+
             current_url = self.driver.current_url
             print("🌐 QA Sayfa URL:", current_url)
             return "quality-assurance" in current_url or "qa" in current_url
