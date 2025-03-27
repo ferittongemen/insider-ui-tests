@@ -1,10 +1,8 @@
 import time
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
-
-from .base_page import BasePage
 from selenium.webdriver.support import expected_conditions as EC
+from .base_page import BasePage
 
 class QACareersPage(BasePage):
     def __init__(self, driver):
@@ -44,24 +42,16 @@ class QACareersPage(BasePage):
         print("⏳ Department filtresinin 'Quality Assurance' olmasını bekliyoruz...")
 
         for attempt in range(3):
-            self.scroll_to_element(By.ID, self.department_container_id)  # ⚠️ Buraya ekle
-
-            success = self.wait_for_element_text_to_be(
-                By.ID, self.department_container_id, "Quality Assurance", timeout=5
-            )
+            self.scroll_to_element(By.ID, self.department_container_id)
+            success = self.wait_for_element_text_to_be(By.ID, self.department_container_id, "Quality Assurance", timeout=5)
 
             if success:
                 print("✅ Department doğru, lokasyon dropdown'a tıklanıyor...")
-
-                # 💡 Eski kartlar varsa, İstanbul seçilmeden önce kaybolmalarını bekle
                 self.wait_for_job_cards_to_be_replaced()
-
                 self.click_element(By.ID, self.location_container_id)
                 print("⏳ 'Istanbul, Turkiye' seçeneği yükleniyor...")
-
                 self.click_element(By.XPATH, self.location_istanbul_xpath)
                 print("✅ 'Istanbul, Turkiye' seçeneği seçildi.")
-
                 print("⏳ Job-listing’lerin yüklenmesi bekleniyor...")
                 self.wait_for_element(By.XPATH, self.job_card_xpath)
                 return
@@ -74,8 +64,7 @@ class QACareersPage(BasePage):
     def wait_for_job_cards_to_load(self, timeout=15):
         print("⏳ Job kartlarının yüklenmesi bekleniyor...")
         WebDriverWait(self.driver, timeout).until(
-            EC.presence_of_element_located(
-                (By.XPATH, self.job_list_xpath))
+            EC.presence_of_element_located((By.XPATH, self.job_list_xpath))
         )
         print("✅ Job kartları yüklendi.")
 
@@ -100,7 +89,6 @@ class QACareersPage(BasePage):
         valid_jobs = 0
         for i, text in enumerate(job_texts, 1):
             print(f"📋 JS Job {i}:\n{text}\n")
-
             lower_text = text.lower()
             if "quality assurance" in lower_text and "istanbul" in lower_text:
                 print(f"✅ Job {i} UYUMLU: QA + Istanbul")
@@ -117,35 +105,29 @@ class QACareersPage(BasePage):
             self.wait_for_element(By.XPATH, self.job_card_xpath, timeout=15)
             print("✅ Pozisyon kartları yüklendi.")
 
-            self.scroll_to_element(By.XPATH, self.view_role_button_xpath)
-
-            for attempt in range(2):  # en az 2 kere denesin
+            for attempt in range(3):
                 try:
                     view_role_buttons = self.driver.find_elements(By.XPATH, self.view_role_button_xpath)
                     if view_role_buttons:
                         view_role_button = view_role_buttons[0]
-                        print("✅ View Role butonu tekrar locate edildi.")
-
-                        # Scroll tekrar gerekebilir
-                        self.driver.execute_script("arguments[0].scrollIntoView(true);", view_role_button)
-                        time.sleep(0.5)  # scroll sonrası küçük bekleme
+                        self.driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", view_role_button)
+                        time.sleep(0.5)
 
                         try:
                             view_role_button.click()
-                            print("✅ View Role butonuna normal tıklama başarılı.")
+                            print("✅ Normal tıklama başarılı.")
                         except Exception as e:
-                            print(f"⚠️ Normal tıklama başarısız: {e}, JavaScript ile tıklanıyor...")
+                            print(f"⚠️ Normal tıklama başarısız: {e}, JS fallback devrede.")
                             self.driver.execute_script("arguments[0].click();", view_role_button)
 
-                        break  # başarılıysa döngüden çık
+                        break
                     else:
                         print("❌ View Role butonu bulunamadı.")
                         return False
-                except Exception as e:
-                    print(f"⚠️ {attempt+1}. denemede stale hatası: {e}, yeniden deneniyor...")
-                    time.sleep(1)
 
-            self.wait_for_page_to_load()
+                except Exception as e:
+                    print(f"⚠️ {attempt + 1}. denemede hata: {e}")
+                    time.sleep(1)
 
             windows = self.driver.window_handles
             if len(windows) > 1:
@@ -156,7 +138,7 @@ class QACareersPage(BasePage):
             return "lever.co" in self.driver.current_url
 
         except Exception as e:
-            print(f"❌ View Role butonuna tıklanırken genel hata oluştu: {e}")
+            print(f"❌ View Role genel hata: {e}")
             return False
 
     def click_see_all_qa_jobs(self):
