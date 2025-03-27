@@ -21,15 +21,7 @@ class QACareersPage(BasePage):
         try:
             print("🔍 QA sayfasının başlığı kontrol ediliyor...")
             self.wait_for_page_to_load()
-
-            # View Role varsa ek olarak beklenebilir ama zorunlu değil
-            print("🔄 QA sayfasında job kartları aranıyor...")
-            job_cards = self.driver.find_elements(By.XPATH, self.job_card_xpath)
-
-            if not job_cards:
-                print("⚠️ QA sayfasında hiç job kartı bulunamadı.")
-                return False
-
+            self.wait_for_element(By.XPATH, self.view_role_button_xpath)
             current_url = self.driver.current_url
             print("🌐 QA Sayfa URL:", current_url)
             return "quality-assurance" in current_url or "qa" in current_url
