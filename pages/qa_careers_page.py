@@ -118,19 +118,32 @@ class QACareersPage(BasePage):
             print("✅ Pozisyon kartları yüklendi.")
 
             self.scroll_to_element(By.XPATH, self.view_role_button_xpath)
-            view_role_buttons = self.driver.find_elements(By.XPATH, self.view_role_button_xpath)
 
-            if view_role_buttons:
-                view_role_button = view_role_buttons[0]
+            for attempt in range(2):  # en az 2 kere denesin
                 try:
-                    print("✅ Görünür hale gelen View Role butonuna tıklanıyor...")
-                    view_role_button.click()
+                    view_role_buttons = self.driver.find_elements(By.XPATH, self.view_role_button_xpath)
+                    if view_role_buttons:
+                        view_role_button = view_role_buttons[0]
+                        print("✅ View Role butonu tekrar locate edildi.")
+
+                        # Scroll tekrar gerekebilir
+                        self.driver.execute_script("arguments[0].scrollIntoView(true);", view_role_button)
+                        time.sleep(0.5)  # scroll sonrası küçük bekleme
+
+                        try:
+                            view_role_button.click()
+                            print("✅ View Role butonuna normal tıklama başarılı.")
+                        except Exception as e:
+                            print(f"⚠️ Normal tıklama başarısız: {e}, JavaScript ile tıklanıyor...")
+                            self.driver.execute_script("arguments[0].click();", view_role_button)
+
+                        break  # başarılıysa döngüden çık
+                    else:
+                        print("❌ View Role butonu bulunamadı.")
+                        return False
                 except Exception as e:
-                    print(f"⚠️ Normal tıklama başarısız: {e}, JavaScript ile tıklanıyor...")
-                    self.driver.execute_script("arguments[0].click();", view_role_button)
-            else:
-                print("❌ HATA: View Role butonu DOM'da bulunamadı.")
-                return False
+                    print(f"⚠️ {attempt+1}. denemede stale hatası: {e}, yeniden deneniyor...")
+                    time.sleep(1)
 
             self.wait_for_page_to_load()
 
@@ -143,7 +156,7 @@ class QACareersPage(BasePage):
             return "lever.co" in self.driver.current_url
 
         except Exception as e:
-            print(f"❌ View Role butonuna tıklanırken hata oluştu: {e}")
+            print(f"❌ View Role butonuna tıklanırken genel hata oluştu: {e}")
             return False
 
     def click_see_all_qa_jobs(self):
