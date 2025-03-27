@@ -9,7 +9,7 @@ class CareersPage(BasePage):
     def __init__(self, driver):
         super().__init__(driver)
         self.LOCATIONS_XPATH = "//*[@id='career-our-location']/div/div/div/div[1]"
-        self.teams_xpath = "//*[@id='career-find-our-calling']/div/div/a"
+        self.TEAMS_XPATH = "//*[@id='career-find-our-calling']/div/div/a"
         self.life_at_insider_xpath = "//h2[contains(text(), 'Life at Insider')]"
         self.see_all_teams_xpath = "//a[contains(text(), 'See all teams')]"
         self.qa_careers_xpath = "//h3[contains(text(), 'Quality Assurance')]"
@@ -37,7 +37,7 @@ class CareersPage(BasePage):
             print("✅ Locations bölümü bulundu!")
 
             print("🔄 Bekleniyor: Teams bölümü...")
-            self.wait_for_element(By.XPATH, self.teams_xpath)
+            self.wait_for_element(By.XPATH, self.TEAMS_XPATH)
             print("✅ Teams bölümü bulundu!")
 
             self.wait_for_element(By.XPATH, self.life_at_insider_xpath)
