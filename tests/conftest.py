@@ -1,7 +1,7 @@
 import pytest
 import os
 from datetime import datetime
-from database_controller import insert_test_result_to_influx
+from database_controller import insert_test_result_to_influxdb
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item):
@@ -18,7 +18,7 @@ def pytest_runtest_makereport(item):
 
         # Sonucu InfluxDB'ye yaz
         try:
-            insert_test_result_to_influx(
+            insert_test_result_to_influxdb(
                 test_name=test_name,
                 status=status,
                 duration=duration,
