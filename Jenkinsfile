@@ -22,7 +22,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '. $VENV_DIR/bin/activate && PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys'
+                sh '. $VENV_DIR/bin/activate && PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'
             }
         }
 
