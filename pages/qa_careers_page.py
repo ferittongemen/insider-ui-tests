@@ -121,8 +121,13 @@ class QACareersPage(BasePage):
             view_role_button = self.wait_for_element_to_be_clickable(By.XPATH, self.view_role_button_xpath, timeout=10)
 
             if view_role_button:
-                print("✅ Görünür hale gelen View Role butonuna tıklanıyor...")
-                view_role_button.click()
+                try:
+                    print("✅ Görünür hale gelen View Role butonuna tıklanıyor...")
+                    view_role_button.click()
+                except Exception:
+                    print("⚠️ Normal tıklama başarısız, JavaScript ile tıklanıyor...")
+                    self.driver.execute_script("arguments[0].click();", view_role_button)
+
                 self.wait_for_page_to_load()
 
                 windows = self.driver.window_handles
