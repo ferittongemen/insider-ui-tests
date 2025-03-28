@@ -27,7 +27,7 @@ def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
                     "test_name": test_name,
                     "status": status,
                 },
-                "time": timestamp.isoformat(),  # Artık dışarıdan gelen timestamp kullanılıyor
+                "time": timestamp.isoformat(),
                 "fields": {
                     "duration": float(duration)
                 }

@@ -96,7 +96,6 @@ class CareersPage(BasePage):
 
             qa_careers_section = self.wait_for_element(By.XPATH, self.qa_careers_xpath)
 
-            # Workaround: Altındaki 'Open Positions' linkini yakala
             qa_open_link = self.wait_for_element_to_be_clickable(By.XPATH, self.qa_open_positions_xpath)
 
             if qa_open_link:
@@ -106,7 +105,6 @@ class CareersPage(BasePage):
                 qa_open_link.click()
                 print("✅ 'QA Careers' sayfasına geçildi (link ile).")
             else:
-                # Eğer link bulunamazsa yine eski yöntemle devam et
                 print("⚠️ Link bulunamadı, JavaScript ile başlığa tıklanıyor...")
                 self.driver.execute_script("arguments[0].click();", qa_careers_section)
                 print("✅ 'QA Careers' butonuna tıklandı (fallback).")
