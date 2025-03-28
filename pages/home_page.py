@@ -16,7 +16,10 @@ class HomePage(BasePage):
         return "Insider" in self.driver.title
 
     def accept_cookies(self):
-        """BasePage metodunu kullanarak çerezleri kabul et"""
+        """
+        BasePage metodunu kullanarak çerezleri kabul et
+
+        """
         super().accept_cookies(self.cookie_button_xpath)
 
     def navigate_to_careers(self):

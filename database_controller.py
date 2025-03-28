@@ -1,5 +1,6 @@
 from influxdb import InfluxDBClient
 
+
 # InfluxDB'ye test sonucu yazan fonksiyon
 def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
     try:
