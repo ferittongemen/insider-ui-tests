@@ -22,16 +22,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                script {
-                    def testStatus = sh(
-                        script: ". $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings",
-                        returnStatus: true
-                    )
-
-                    if (testStatus != 0) {
-                        currentBuild.result = 'UNSTABLE'
-                    }
-                }
+                sh '. $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'
             }
         }
     }
@@ -53,20 +44,12 @@ pipeline {
             script {
                 try {
                     allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
-                    echo "✅ Allure report was successfully generated."
                 } catch (Exception e) {
                     echo "❌ Allure report generation failed: ${e.message}"
-                    // Eğer sadece bu rapor başarısızsa ve testler geçtiyse, bu build'i UNSTABLE yapma
                 }
             }
 
-            // Gerçekten zorla SUCCESS yapmak için
-            script {
-                if (currentBuild.result == 'UNSTABLE') {
-                    echo "⚠️ Build was UNSTABLE — forcing it to SUCCESS since tests passed."
-                    currentBuild.result = 'SUCCESS'
-                }
-            }
+            echo "📦 Final Result: ${currentBuild.result}"
         }
     }
 }
