@@ -21,7 +21,7 @@ def driver(request):
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
 
-        service = ChromeDriverManager(version="122.0.6261.94").install()
+        service = ChromeDriverManager(version="134.0.6998.166").install()
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
     elif request.param == "firefox":
