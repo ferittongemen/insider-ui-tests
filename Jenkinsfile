@@ -22,12 +22,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '. $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'            }
-        }
-
-        stage('Generate Allure Report') {
-            steps {
-                allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+                sh '. $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'
             }
         }
     }
@@ -42,6 +37,15 @@ pipeline {
                     archiveArtifacts artifacts: '**/screenshots/*.png', fingerprint: true
                 } else {
                     echo "✅ No screenshots found. Skipping archive."
+                }
+            }
+
+            echo "🧾 Generating Allure report..."
+            script {
+                try {
+                    allure includeProperties: false, jdk: '', results: [[path: 'allure-results']]
+                } catch (Exception e) {
+                    echo "❌ Allure report generation failed: ${e.message}"
                 }
             }
         }
