@@ -206,3 +206,4 @@ class QACareersPage(BasePage):
             print("✅ 'See all QA jobs' butonuna tıklandı.")
         else:
             print("❌ HATA: 'See all QA jobs' butonu bulunamadı.")
+            

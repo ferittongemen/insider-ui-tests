@@ -152,3 +152,4 @@ class BasePage:
             actual_text = self.get_element_text(by, locator)
             print(f"❌ HATA: Elementin text'i '{expected_text}' olmadı. Son durum: '{actual_text}'")
             return False
+

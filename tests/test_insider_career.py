@@ -10,7 +10,13 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 
 @pytest.fixture(params=["chrome", "firefox"])
 def driver(request):
-    """Tarayıcı başlatma ve test sonrası kapatma"""
+    """
+    Fixture to initialize and quit browser driver.
+
+    :param request: Pytest request object
+    :yield: Selenium WebDriver instance
+
+    """
     if request.param == "chrome":
         chrome_options = ChromeOptions()
         chrome_options.add_argument("--no-sandbox")
@@ -18,7 +24,6 @@ def driver(request):
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--window-size=1920,1080")
 
-        # Manuel belirttiğin driver path
         service = ChromeService(executable_path="/Users/ferit.tongemen/Documents/Drivers/chromedriver-mac-arm64/chromedriver")
         driver = webdriver.Chrome(service=service, options=chrome_options)
 
@@ -72,3 +77,4 @@ def test_insider_career_page(driver):
 
     print("🎉 Tüm testler başarıyla tamamlandı!")
     print("🌐 Son URL:", driver.current_url)
+    

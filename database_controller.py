@@ -40,3 +40,4 @@ def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
 
     except Exception as e:
         print(f"❌ InfluxDB yazım hatası: {e}")
+

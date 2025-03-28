@@ -44,3 +44,4 @@ def pytest_runtest_makereport(item):
                 screenshot_path = os.path.join(screenshot_dir, f"{test_name}.png")
                 driver.save_screenshot(screenshot_path)
                 print(f"🖼 Ekran görüntüsü alındı: {screenshot_path}")
+                
