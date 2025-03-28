@@ -7,13 +7,23 @@ from webdriver_manager.firefox import GeckoDriverManager
 from pages.home_page import HomePage
 from pages.careers_page import CareersPage
 from pages.qa_careers_page import QACareersPage
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+
 
 @pytest.fixture(params=["chrome", "firefox"])
 def driver(request):
     """Tarayıcı başlatma ve test sonrası kapatma"""
     if request.param == "chrome":
+        chrome_options = ChromeOptions()
+        chrome_options.add_argument("--headless=new")  # Yeni headless mod (daha stabil)
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--window-size=1920,1080")
+
         service = ChromeService(ChromeDriverManager().install())
-        driver = webdriver.Chrome(service=service)
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
     elif request.param == "firefox":
         service = FirefoxService(GeckoDriverManager().install())
         driver = webdriver.Firefox(service=service)
