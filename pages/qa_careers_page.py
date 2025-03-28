@@ -124,18 +124,35 @@ class QACareersPage(BasePage):
                     else:
                         print("❌ View Role butonu bulunamadı.")
                         return False
-
                 except Exception as e:
                     print(f"⚠️ {attempt + 1}. denemede hata: {e}")
                     time.sleep(1)
 
             windows = self.driver.window_handles
             if len(windows) > 1:
-                self.driver.switch_to.window(windows[1])
-                print("🔄 Yeni sekmeye geçildi:", self.driver.current_url)
+                try:
+                    self.driver.switch_to.window(windows[1])
+                    print("🔄 Yeni sekmeye geçildi.")
+                except Exception as e:
+                    print(f"❌ Sekmeye geçerken hata oluştu: {e}")
+                    return False
+            else:
+                print("⚠️ Yeni sekme açılmadı.")
+                return False
 
-            self.wait_for_page_to_load()
-            return "lever.co" in self.driver.current_url
+            try:
+                self.wait_for_page_to_load()
+            except Exception as e:
+                print(f"⚠️ Sayfa yüklenmedi: {e}")
+                return False
+
+            try:
+                current_url = self.driver.current_url
+                print("🌐 Açılan URL:", current_url)
+                return "lever.co" in current_url
+            except Exception as e:
+                print(f"❌ URL alınamadı: {e}")
+                return False
 
         except Exception as e:
             print(f"❌ View Role genel hata: {e}")
