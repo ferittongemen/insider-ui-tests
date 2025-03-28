@@ -3,6 +3,12 @@ from .base_page import BasePage
 
 class HomePage(BasePage):
     def __init__(self, driver):
+        """
+        HomePage constructor.
+
+        :param driver: Selenium WebDriver instance
+
+        """
         super().__init__(driver)
         self.url = "https://useinsider.com"
         self.company_menu_xpath = "(//*[@id='navbarDropdownMenuLink'])[5]"
@@ -10,19 +16,33 @@ class HomePage(BasePage):
         self.cookie_button_xpath = "//*[@id='wt-cli-accept-all-btn']"
 
     def open(self):
+        """
+        Opens the Insider homepage.
+
+        """
         self.driver.get(self.url)
 
     def is_accessible(self):
+        """
+        Checks whether the homepage is accessible by verifying the title.
+
+        :return: True if title contains 'Insider', else False
+        :rtype: bool
+
+        """
         return "Insider" in self.driver.title
 
     def accept_cookies(self):
         """
-        BasePage metodunu kullanarak çerezleri kabul et
+        Accepts cookies using BasePage method.
 
         """
         super().accept_cookies(self.cookie_button_xpath)
 
     def navigate_to_careers(self):
-        """Kariyer sayfasına git"""
+        """
+        Navigates to the Careers page through the Company menu.
+
+        """
         self.click_element(By.XPATH, self.company_menu_xpath)
         self.click_element(By.XPATH, self.careers_link_xpath)

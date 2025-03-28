@@ -6,6 +6,12 @@ from .base_page import BasePage
 
 class QACareersPage(BasePage):
     def __init__(self, driver):
+        """
+        QACareersPage constructor.
+
+        :param driver: Selenium WebDriver instance
+
+        """
         super().__init__(driver)
         self.department_container_id = "select2-filter-by-department-container"
         self.location_container_id = "select2-filter-by-location-container"
@@ -18,6 +24,13 @@ class QACareersPage(BasePage):
         self.job_list_xpath = "//div[@id='jobs-list']//div[contains(@class, 'position-list-item')]"
 
     def is_accessible(self):
+        """
+        Verifies if the QA Careers page is accessible by checking the URL and page elements.
+
+        :return: True if accessible, False otherwise
+        :rtype: bool
+
+        """
         try:
             print("🔍 QA sayfasının başlığı kontrol ediliyor...")
             self.wait_for_page_to_load()
@@ -30,6 +43,13 @@ class QACareersPage(BasePage):
             return False
 
     def filter_jobs(self, location, department):
+        """
+        Filters job listings by location and department.
+
+        :param location: Location to filter (e.g., 'Istanbul')
+        :param department: Department to filter (e.g., 'Quality Assurance')
+
+        """
         location_dropdown = self.wait_for_element_to_be_clickable(By.XPATH, self.location_dropdown_xpath)
         if location_dropdown:
             location_dropdown.send_keys(location)
@@ -39,6 +59,11 @@ class QACareersPage(BasePage):
             department_dropdown.send_keys(department)
 
     def select_location_if_department_is_qa(self):
+        """
+        If the department is 'Quality Assurance', selects 'Istanbul, Turkiye' from location filter.
+        Retries up to 3 times if department is not loaded properly.
+
+        """
         print("⏳ Department filtresinin 'Quality Assurance' olmasını bekliyoruz...")
 
         for attempt in range(3):
@@ -62,6 +87,12 @@ class QACareersPage(BasePage):
         print("❌ HATA: Department değeri 'Quality Assurance' olarak ayarlanamadı.")
 
     def wait_for_job_cards_to_load(self, timeout=15):
+        """
+        Waits for job cards to load completely.
+
+        :param timeout: Maximum wait time in seconds
+
+        """
         print("⏳ Job kartlarının yüklenmesi bekleniyor...")
         WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located((By.XPATH, self.job_list_xpath))
@@ -69,6 +100,11 @@ class QACareersPage(BasePage):
         print("✅ Job kartları yüklendi.")
 
     def wait_for_job_cards_to_be_replaced(self):
+        """
+        Waits until old job cards are replaced with new ones.
+
+        """
+
         try:
             print("⏳ Eski job kartlarının görünmez olmasını bekliyoruz...")
             self.wait.until(EC.invisibility_of_element_located((By.XPATH, self.job_card_xpath)))
@@ -80,6 +116,13 @@ class QACareersPage(BasePage):
         print("✅ Yeni job kartları DOM’da yüklendi.")
 
     def verify_job_listings(self):
+        """
+        Validates that each job listing includes both QA and Istanbul keywords.
+
+        :return: True if valid jobs exist, False otherwise
+        :rtype: bool
+
+        """
         print("🧪 Sayfada QA + Istanbul job'ları var mı JS ile kontrol ediliyor...")
 
         job_texts = self.driver.execute_script("""
@@ -100,6 +143,13 @@ class QACareersPage(BasePage):
         return valid_jobs > 0
 
     def verify_view_role_redirects(self):
+        """
+        Clicks the first 'View Role' button and verifies it redirects to lever.co job detail page.
+
+        :return: True if redirected to lever.co, else False
+        :rtype: bool
+        
+        """
         print("🔍 View Role butonu aranıyor...")
         try:
             self.wait_for_element(By.XPATH, self.job_card_xpath, timeout=15)
@@ -142,6 +192,12 @@ class QACareersPage(BasePage):
             return False
 
     def click_see_all_qa_jobs(self):
+        """
+        Clicks on the 'See all QA jobs' button.
+
+        :return: None
+        
+        """
         print("🔍 'See all QA jobs' butonu bekleniyor...")
         button = self.wait_for_element_to_be_clickable(By.XPATH, self.see_all_qa_jobs_xpath)
         if button:

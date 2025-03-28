@@ -5,6 +5,14 @@ from database_controller import insert_test_result_to_influxdb
 
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item):
+    """
+    Pytest hook to handle test result reporting:
+    - Inserts test result to InfluxDB
+    - Captures screenshot on test failure
+
+    :param item: pytest test item
+    
+    """
     # Testin sonucunu al
     outcome = yield
     report = outcome.get_result()

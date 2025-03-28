@@ -7,6 +7,12 @@ from .base_page import BasePage
 
 class CareersPage(BasePage):
     def __init__(self, driver):
+        """
+        CareersPage constructor.
+
+        :param driver: Selenium WebDriver instance
+
+        """
         super().__init__(driver)
         self.LOCATIONS_XPATH = "//*[@id='career-our-location']/div/div/div/div[1]"
         self.TEAMS_PATH = "//*[@id='career-find-our-calling']/div/div/a"
@@ -17,6 +23,13 @@ class CareersPage(BasePage):
         self.qa_open_positions_xpath = "//h3[contains(text(), 'Quality Assurance')]/following-sibling::a[contains(text(), 'Open Positions')]"
 
     def is_accessible(self):
+        """
+        Verifies if the Careers page is accessible.
+
+        :return: True if title or URL contains career-related keywords, else False
+        :rtype: bool
+
+        """
         try:
             print("🔍 QA sayfasının başlığı kontrol ediliyor...")
             self.wait_for_page_to_load()
@@ -30,7 +43,13 @@ class CareersPage(BasePage):
             return False
 
     def verify_sections(self):
-        """Locations, Teams ve Life at Insider bölümlerinin yüklenmesini bekler ve doğrular."""
+        """
+        Verifies the presence of key sections: Locations, Teams, and Life at Insider.
+
+        :return: True if all sections are found, else False
+        :rtype: bool
+
+        """
         try:
             print("🔄 Bekleniyor: Locations bölümü...")
             self.wait_for_element(By.XPATH, self.LOCATIONS_XPATH)
@@ -49,6 +68,12 @@ class CareersPage(BasePage):
             return False
 
     def go_to_qa_careers(self):
+        """
+        Navigates to the QA Careers page, using fallback methods if necessary.
+
+        :raises Exception: If navigation fails
+        
+        """
         try:
             print("🔄 'See All Teams' butonu bekleniyor ve kaydırılıyor...")
             see_all_teams_button = self.wait_for_element_to_be_clickable(By.XPATH, self.see_all_teams_xpath)

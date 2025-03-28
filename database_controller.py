@@ -3,6 +3,19 @@ from influxdb import InfluxDBClient
 
 # InfluxDB'ye test sonucu yazan fonksiyon
 def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
+    """
+    Inserts a test result into the InfluxDB database.
+
+    :param test_name: Name of the test case
+    :type test_name: str
+    :param status: Status of the test ('passed' or 'failed')
+    :type status: str
+    :param duration: Duration of the test execution in seconds
+    :type duration: float
+    :param timestamp: Timestamp of the test execution (UTC)
+    :type timestamp: datetime.datetime
+    
+    """
     try:
         client = InfluxDBClient(host='localhost', port=8086)
         client.switch_database('test_results')
