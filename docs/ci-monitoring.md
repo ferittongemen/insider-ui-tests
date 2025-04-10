@@ -1,92 +1,106 @@
-CI/CD & Test Monitoring Setup (Local Jenkins + InfluxDB + Grafana)
+# CI/CD & Test Monitoring Setup (Local Jenkins + InfluxDB + Grafana)
 
 This document details the CI/CD pipeline and test monitoring system implemented in the project using Jenkins, GitHub Webhooks, InfluxDB, and Grafana.
 
-🎥 Demo Videos
+---
 
-🔗 Jenkins + Ngrok + GitHub Webhook Trigger Demo
+## 🎥 Demo Videos
 
-🔗 Grafana Test Result Monitoring Dashboard Demo
+- [🔗 Jenkins +  Grafana + Ngrok + GitHub Webhook Trigger Demo PART 1](https://www.loom.com/share/573a7300434347f199c6f64bfc901b2e)
+- [🔗 Jenkins +  Grafana + Ngrok + GitHub Webhook Trigger Demo PART 2](https://www.loom.com/share/91729b61720a4a1188a8aa0caa289771)
 
-🧰 Tools Used
+---
 
-Jenkins (locally installed) for CI/CD automation
+## 🧰 Tools Used
 
-Ngrok to expose local Jenkins instance to the internet
+- Jenkins (locally installed) for CI/CD automation  
+- Ngrok to expose local Jenkins instance to the internet  
+- GitHub Webhooks to trigger Jenkins jobs  
+- InfluxDB (locally installed) to store test results  
+- Grafana to visualize test metrics from InfluxDB  
+- Pytest for automated UI testing  
 
-GitHub Webhooks to trigger Jenkins jobs
+---
 
-InfluxDB (locally installed) to store test results
+## 🔧 Installation & Setup Guide
 
-Grafana to visualize test metrics from InfluxDB
+### 📂 InfluxDB Installation (macOS with Homebrew)
 
-Pytest for automated UI testing
-
-🔧 Installation & Setup Guide
-
-📂 InfluxDB Installation (macOS with Homebrew)
-
+```bash
 brew update
 brew install influxdb@1
+```
 
 Start InfluxDB service:
 
-influxdb
+```bash
+influxd
+```
 
 Create the database:
 
+```bash
 influx
 CREATE DATABASE test_results;
+```
 
-📂 Grafana Installation (macOS with Homebrew)
+---
 
+### 📂 Grafana Installation (macOS with Homebrew)
+
+```bash
 brew install grafana
 brew services start grafana
+```
 
-Access Grafana at: http://localhost:3000Default credentials:
+Access Grafana at: [http://localhost:3000](http://localhost:3000)
 
-Username: admin
+Default credentials:
+- Username: `admin`
+- Password: `admin` (will prompt to change on first login)
 
-Password: admin (will prompt to change on first login)
+---
 
-🔗 Connect Grafana to InfluxDB
+### 🔗 Connect Grafana to InfluxDB
 
-Go to Configuration > Data Sources
+1. Go to `Configuration > Data Sources`
+2. Click **Add data source**
+3. Select **InfluxDB**
+4. Configure:
+   - URL: `http://localhost:8086`
+   - Database: `test_results`
+   - HTTP Method: `GET`
+5. Click **Save & Test**
 
-Click Add data source
+---
 
-Select InfluxDB
-
-Configure:
-
-URL: http://localhost:8086
-
-Database: test_results
-
-HTTP Method: GET
-
-Click Save & Test
-
-🌐 Ngrok Setup
+## 🌐 Ngrok Setup
 
 Install (if not already installed):
 
+```bash
 brew install --cask ngrok
+```
 
 Run Ngrok tunnel for Jenkins:
 
+```bash
 ngrok http 8080
+```
 
 Copy the HTTPS forwarding URL and add it to GitHub Webhooks.
 
-🛠️ Jenkins Setup
+---
 
-Jenkins Installation & Pipeline Configuration
+## 🛠️ Jenkins Setup
 
-Jenkins is installed and runs locally on localhost:8080
+### Jenkins Installation & Pipeline Configuration
+
+Jenkins is installed and runs locally on `localhost:8080`.
 
 A Pipeline job is created and configured with the following Jenkinsfile:
 
+```groovy
 pipeline {
     agent any
 
@@ -142,25 +156,31 @@ pipeline {
         }
     }
 }
+```
 
-🔁 GitHub Webhook Integration
+---
+
+## 🔁 GitHub Webhook Integration
 
 Ngrok is used to tunnel Jenkins from localhost:
 
+```bash
 ngrok http 8080
+```
 
 The generated HTTPS endpoint is used in GitHub Webhook settings:
 
-Payload URL: https://<ngrok_subdomain>.ngrok.io/github-webhook/
+- **Payload URL**: `https://<ngrok_subdomain>.ngrok.io/github-webhook/`
+- **Content type**: `application/json`
+- **Events**: Push
 
-Content type: application/json
+---
 
-Events: Push
+## 🧪 Test Metrics & InfluxDB
 
-🧪 Test Metrics & InfluxDB
+### Test Result Logger (`database_controller.py`)
 
-Test Result Logger (database_controller.py)
-
+```python
 from influxdb import InfluxDBClient
 
 def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
@@ -188,51 +208,50 @@ def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
 
     except Exception as e:
         print(f"❌ InfluxDB yazım hatası: {e}")
+```
 
-📈 Grafana Setup
+---
 
-Grafana Configuration
+## 📈 Grafana Setup
 
-InfluxDB is added as a data source using:
+### Grafana Configuration
 
-Type: influxdb
+- InfluxDB is added as a data source using:
+  - Type: `influxdb`
+  - UID: `feh34z1n6yo00b`
+  - Database: `test_results`
 
-UID: feh34z1n6yo00b
+### Custom Dashboard (Pie Chart Example)
 
-Database: test_results
+**Query:**
 
-Custom Dashboard (Pie Chart Example)
-
-Query:
-
+```sql
 SELECT count("duration") FROM "ui_test_results" WHERE $timeFilter GROUP BY "status"
+```
 
-Panel includes overrides to color:
+**Panel includes color overrides:**
+- `status = failed` → red  
+- `status = passed` → green  
 
-status = failed in red
+---
 
-status = passed in green
+## ✅ CI/CD Flow Summary
 
-✅ CI/CD Flow Summary
+1. Developer pushes code to GitHub  
+2. GitHub webhook triggers Jenkins pipeline  
+3. Jenkins installs dependencies, runs Pytest tests  
+4. `database_controller.py` writes test metrics to InfluxDB  
+5. Grafana dashboard reflects test results in real-time  
 
-Developer pushes code to GitHub.
+---
 
-GitHub webhook triggers Jenkins pipeline.
+## 🗂️ Notes
 
-Jenkins installs dependencies, runs Pytest tests.
+- Jenkins, InfluxDB, and Grafana are all running locally (no Docker)  
+- Ngrok must be kept active during webhook usage  
+- Consider automating Ngrok startup via `systemd` or a startup script  
+- All test statuses, durations, and timestamps are stored as time-series data  
 
-database_controller.py writes test metrics to InfluxDB.
+---
 
-Grafana dashboard reflects test results in real-time.
-
-🗂️ Notes
-
-Jenkins, InfluxDB, and Grafana are all running locally (no Docker).
-
-Ngrok must be kept active during webhook usage.
-
-Consider automating ngrok startup via systemd or shell alias.
-
-All test statuses, durations, and timestamps are stored as time-series data.
-
-This setup provides full visibility into test performance and a seamless CI/CD feedback loop with no containerization overhead.
+> ✅ This setup provides full visibility into test performance and a seamless CI/CD feedback loop with no containerization overhead.
