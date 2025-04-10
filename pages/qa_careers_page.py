@@ -16,6 +16,16 @@ class QACareersPage(BasePage):
     JOB_LIST_XPATH = "//div[@id='jobs-list']//div[contains(@class, 'position-list-item')]"
 
     def is_accessible(self):
+        """
+        Checks if the QA careers page is accessible by:
+        - Waiting for page load
+        - Verifying URL contains 'quality-assurance' or 'qa'
+        - Ensuring presence of 'View Role' button
+
+        :return: True if accessible, False otherwise
+        :rtype: bool
+
+        """
         try:
             print("🔍 Checking QA careers page accessibility...")
             self.wait_for_page_to_load()
@@ -28,6 +38,13 @@ class QACareersPage(BasePage):
             return False
 
     def filter_jobs(self, location, department):
+        """
+        Filters job listings by sending the given values to location and department dropdowns.
+
+        :param location: Location text to input
+        :param department: Department text to input
+
+        """
         location_dropdown = self.wait_for_element_to_be_clickable(By.XPATH, self.LOCATION_DROPDOWN_XPATH)
         if location_dropdown:
             location_dropdown.send_keys(location)
@@ -37,6 +54,14 @@ class QACareersPage(BasePage):
             department_dropdown.send_keys(department)
 
     def select_location_if_department_is_qa(self):
+        """
+        Waits for 'Quality Assurance' to appear as selected department, then:
+        - Selects 'Istanbul, Turkiye' from location dropdown
+        - Waits for job cards to update
+
+        Retries the check up to 3 times.
+
+        """
         print("⏳ Waiting for department to be 'Quality Assurance'...")
 
         for attempt in range(3):
@@ -59,6 +84,12 @@ class QACareersPage(BasePage):
         print("❌ ERROR: Failed to set department to 'Quality Assurance'.")
 
     def wait_for_job_cards_to_load(self, timeout=15):
+        """
+        Waits until job cards are present in the DOM.
+
+        :param timeout: Max wait time in seconds (default: 15)
+
+        """
         print("⏳ Waiting for job cards to load...")
         WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located((By.XPATH, self.JOB_LIST_XPATH))
@@ -66,6 +97,11 @@ class QACareersPage(BasePage):
         print("✅ Job cards loaded.")
 
     def wait_for_job_cards_to_be_replaced(self):
+        """
+        Waits for old job cards to disappear and ensures new ones are loaded into the DOM.
+        Used after filtering or updating criteria.
+
+        """
         try:
             print("⏳ Waiting for old job cards to disappear...")
             self.wait.until(EC.invisibility_of_element_located((By.XPATH, self.JOB_CARD_XPATH)))
@@ -77,6 +113,15 @@ class QACareersPage(BasePage):
         print("✅ New job cards loaded in the DOM.")
 
     def verify_job_listings(self):
+        """
+        Uses JavaScript to extract visible job listings and validate:
+        - Each job includes 'Quality Assurance'
+        - Each job location includes 'Istanbul'
+
+        :return: True if at least one valid job found, False otherwise
+        :rtype: bool
+
+        """
         print("🧪 Verifying that job listings match QA + Istanbul criteria using JS...")
 
         job_texts = self.driver.execute_script("""
@@ -97,6 +142,18 @@ class QACareersPage(BasePage):
         return valid_jobs > 0
 
     def verify_view_role_redirects(self):
+        """
+        Clicks the first available 'View Role' button and checks if it opens the Lever application page.
+
+        - Scrolls to the button
+        - Tries clicking (with fallback)
+        - Switches to new tab
+        - Verifies final URL
+
+        :return: True if redirection to Lever successful, False otherwise
+        :rtype: bool
+
+        """
         print("🔍 Looking for 'View Role' button...")
         try:
             self.wait_for_element(By.XPATH, self.JOB_CARD_XPATH, timeout=15)
@@ -128,6 +185,13 @@ class QACareersPage(BasePage):
             return False
 
     def click_see_all_qa_jobs(self):
+        """
+        Clicks the 'See all QA jobs' button after ensuring it is clickable and visible.
+
+        Scrolls to the button and performs the click.
+        Logs failure if the button is not found.
+
+        """
         print("🔍 Waiting for 'See all QA jobs' button...")
         button = self.wait_for_element_to_be_clickable(By.XPATH, self.SEE_ALL_QA_JOBS_XPATH)
         if button:

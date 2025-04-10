@@ -1,6 +1,5 @@
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
 
 
@@ -8,12 +7,16 @@ from pages.home_page import HomePage
 from pages.careers_page import CareersPage
 from pages.qa_careers_page import QACareersPage
 
-"""
-Navigate to Insider's Homepage to verify its accessibilaity.
-From the navigation bar, select "Company", then "Careers" and verify if the Career page, including its Locations, Teams, and Life at Insider sections, are accessible.
-Visit the Quality Assurance Careers Page, click "See all QA jobs", filter the jobs by location (Istanbul, Turkey) and department (Quality Assurance), and check for the job listings' presence.
-Ensure each job position lists "Quality Assurance" in both the Position and Department fields and "Istanbul, Turkey" in the Location field.
-Verify that clicking the "View Role" button redirects to the Lever Application form page.
+""" Test case is:
+
+    1. Go to Insider homepage and check accessibility
+    2. Go to Careers via Company menu
+    3. Check Locations, Teams, and Life at Insider sections
+    4. Go to QA Careers page and click "See all QA jobs"
+    5. Filter by location: Istanbul, Turkey and department: Quality Assurance
+    6. Check that job listings are visible
+    7. Verify each job shows QA in Position and Department, and Istanbul in Location
+    8. Click "View Role" and check redirection to Lever page
 
 """
 

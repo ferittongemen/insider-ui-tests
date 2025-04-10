@@ -8,11 +8,17 @@ from selenium.webdriver.chrome.options import Options as ChromeOptions
 from webdriver_manager.firefox import GeckoDriverManager
 from database_controller import insert_test_result_to_influxdb
 
-# 🌐 DRIVER FIXTURE (Chrome & Firefox)
 @pytest.fixture(params=["chrome", "firefox"])
 def driver(request):
     """
-    Pytest fixture to initialize and teardown Selenium WebDriver for Chrome and Firefox.
+    Pytest fixture to initialize and return a Selenium WebDriver instance.
+
+    This fixture supports both Chrome and Firefox browsers. It:
+    - Configures browser-specific options
+    - Launches the driver
+    - Maximizes the window for consistency
+    - Tears down the driver after test execution
+
     """
     if request.param == "chrome":
         chrome_options = ChromeOptions()
@@ -35,14 +41,22 @@ def driver(request):
     yield driver
     driver.quit()
 
-
-# 🧾 HOOK: InfluxDB logging + Screenshot capture on failure
 @pytest.hookimpl(tryfirst=True, hookwrapper=True)
 def pytest_runtest_makereport(item):
     """
-    Pytest hook to:
-    - Log test results to InfluxDB
-    - Take a screenshot if test fails
+    Pytest hook that runs after each test case.
+
+    Responsibilities:
+    - Logs test results to InfluxDB (name, status, duration, UTC timestamp)
+    - Captures and saves a screenshot when a test fails
+    - Outputs the result clearly in console for visibility
+
+    This hook helps with:
+    - Monitoring test stability in Grafana
+    - Debugging UI failures with screenshots
+
+    Trigger: Runs after the 'call' phase of every test function.
+
     """
     outcome = yield
     report = outcome.get_result()
@@ -53,7 +67,6 @@ def pytest_runtest_makereport(item):
         duration = getattr(report, 'duration', 0)
         timestamp = datetime.now(timezone.utc)
 
-        # ✅ Write result to InfluxDB
         try:
             insert_test_result_to_influxdb(
                 test_name=test_name,
@@ -65,7 +78,6 @@ def pytest_runtest_makereport(item):
         except Exception as e:
             print(f"❌ InfluxDB error: {e}")
 
-        # 📸 Capture screenshot on failure
         if status == "failed":
             driver = item.funcargs.get("driver", None)
             if driver:

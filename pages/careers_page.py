@@ -11,6 +11,14 @@ class CareersPage(BasePage):
     QA_OPEN_POSITIONS_XPATH = "//h3[contains(text(), 'Quality Assurance')]/following-sibling::a[contains(text(), 'Open Positions')]"
 
     def is_accessible(self):
+        """
+        Checks if the current page is accessible by verifying the title and URL.
+        Intended for Career or QA pages.
+
+        :return: True if the page appears to be the correct Careers or QA page, False otherwise.
+        :rtype: bool
+
+        """
         try:
             print("🔍 Checking QA page title...")
             self.wait_for_page_to_load()
@@ -24,6 +32,16 @@ class CareersPage(BasePage):
             return False
 
     def verify_sections(self):
+        """
+        Verifies that all expected sections exist on the Careers page:
+        - Locations
+        - Teams
+        - Life at Insider
+
+        :return: True if all sections are found, False otherwise.
+        :rtype: bool
+
+        """
         try:
             print("🔄 Waiting for Locations section...")
             self.wait_for_element(By.XPATH, self.LOCATIONS_XPATH)
@@ -43,8 +61,18 @@ class CareersPage(BasePage):
 
     def go_to_qa_careers(self):
         """
-        Navigates to the QA Careers page, using fallback methods if necessary.
-        :raises Exception: If navigation fails
+        Navigates to the Quality Assurance careers section on the Careers page.
+
+        Process:
+        - Scrolls to and clicks "See All Teams"
+        - Waits for page to load
+        - Scrolls to "Quality Assurance" section
+        - Tries to click "Open Positions" under QA
+        - Uses JS click fallback if normal click fails
+        - Waits for "See all QA jobs" button to appear
+
+        :raises: Exception is caught and printed if navigation fails.
+
         """
         try:
             print("🔄 Scrolling to 'See All Teams' button...")
@@ -78,7 +106,6 @@ class CareersPage(BasePage):
                 self.driver.execute_script("arguments[0].click();", qa_careers_section)
                 print("✅ Fallback click successful.")
 
-            # QA jobs yüklendi mi kontrol
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'See all QA jobs')]"))
             )

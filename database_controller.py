@@ -14,7 +14,7 @@ def insert_test_result_to_influxdb(test_name, status, duration, timestamp):
     :type duration: float
     :param timestamp: Timestamp of the test execution (UTC)
     :type timestamp: datetime.datetime
-    
+
     """
     try:
         client = InfluxDBClient(host='localhost', port=8086)
