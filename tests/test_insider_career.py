@@ -1,80 +1,64 @@
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import pytest
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.firefox.service import Service as FirefoxService
-from webdriver_manager.firefox import GeckoDriverManager
+
+
 from pages.home_page import HomePage
 from pages.careers_page import CareersPage
 from pages.qa_careers_page import QACareersPage
-from selenium.webdriver.chrome.options import Options as ChromeOptions
 
-@pytest.fixture(params=["chrome", "firefox"])
-def driver(request):
-    """
-    Fixture to initialize and quit browser driver.
+"""
+Navigate to Insider's Homepage to verify its accessibilaity.
+From the navigation bar, select "Company", then "Careers" and verify if the Career page, including its Locations, Teams, and Life at Insider sections, are accessible.
+Visit the Quality Assurance Careers Page, click "See all QA jobs", filter the jobs by location (Istanbul, Turkey) and department (Quality Assurance), and check for the job listings' presence.
+Ensure each job position lists "Quality Assurance" in both the Position and Department fields and "Istanbul, Turkey" in the Location field.
+Verify that clicking the "View Role" button redirects to the Lever Application form page.
 
-    :param request: Pytest request object
-    :yield: Selenium WebDriver instance
+"""
 
-    """
-    if request.param == "chrome":
-        chrome_options = ChromeOptions()
-        chrome_options.add_argument("--no-sandbox")
-        chrome_options.add_argument("--disable-dev-shm-usage")
-        chrome_options.add_argument("--disable-gpu")
-        chrome_options.add_argument("--window-size=1920,1080")
+@pytest.mark.usefixtures("driver")
+class TestInsiderCareer:
 
-        service = ChromeService(executable_path="/Users/ferit.tongemen/Documents/Drivers/chromedriver-mac-arm64/chromedriver")
-        driver = webdriver.Chrome(service=service, options=chrome_options)
+    @pytest.fixture(autouse=True)
+    def setup_pages(self, driver):
+        self.home_page = HomePage(driver)
+        self.careers_page = CareersPage(driver)
+        self.qa_careers_page = QACareersPage(driver)
 
-    elif request.param == "firefox":
-        service = FirefoxService(GeckoDriverManager().install())
-        driver = webdriver.Firefox(service=service)
+    def test_insider_career_page(self):
+        """
+        E2E test to verify QA jobs in Istanbul are visible and accessible.
 
-    driver.maximize_window()
-    yield driver
-    driver.quit()
+        """
+        print("🚀 Opening homepage...")
+        self.home_page.open()
+        assert self.home_page.is_accessible()
 
-def test_insider_career_page(driver):
-    """Insider kariyer sayfası test akışı"""
+        print("✅ Accepting cookies...")
+        self.home_page.accept_cookies()
 
-    print("🚀 Test başlıyor: Insider anasayfası açılıyor...")
-    home_page = HomePage(driver)
-    home_page.open()
-    assert home_page.is_accessible(), "❌ Hata: Insider anasayfası erişilemez!"
+        print("✅ Navigating to careers...")
+        self.home_page.navigate_to_careers()
+        assert self.careers_page.is_accessible()
+        assert self.careers_page.verify_sections()
 
-    print("✅ Çerezler kabul ediliyor...")
-    home_page.accept_cookies()
+        print("✅ Navigating to QA Careers...")
+        self.careers_page.go_to_qa_careers()
+        assert self.qa_careers_page.is_accessible()
 
-    print("✅ Kariyer sayfasına gidiliyor...")
-    home_page.navigate_to_careers()
-    careers_page = CareersPage(driver)
-    assert careers_page.is_accessible(), "❌ Hata: Careers sayfası yüklenemedi!"
+        print("✅ Clicking 'See all QA jobs'...")
+        self.qa_careers_page.click_see_all_qa_jobs()
 
-    print("✅ Sayfa bölümleri kontrol ediliyor...")
-    assert careers_page.verify_sections(), "❌ Hata: Careers sayfasındaki bölümler eksik!"
+        print("✅ Filtering jobs...")
+        self.qa_careers_page.select_location_if_department_is_qa()
+        self.qa_careers_page.wait_for_job_cards_to_be_replaced()
+        self.qa_careers_page.wait_for_job_cards_to_load()
 
-    print("✅ QA Careers sayfasına geçiliyor...")
-    careers_page.go_to_qa_careers()
-    qa_careers_page = QACareersPage(driver)
+        print("✅ Verifying listings...")
+        assert self.qa_careers_page.verify_job_listings()
 
-    print("🔍 QA Careers sayfası erişilebilir mi kontrol ediliyor...")
-    assert qa_careers_page.is_accessible(), "❌ Hata: QA Careers sayfasına erişilemedi!"
+        print("✅ Verifying 'View Role' redirection...")
+        assert self.qa_careers_page.verify_view_role_redirects()
 
-    print("✅ 'See all QA jobs' butonuna tıklanıyor...")
-    qa_careers_page.click_see_all_qa_jobs()
-
-    print("✅ Department'ın 'Quality Assurance' olması bekleniyor ve lokasyon seçimi yapılıyor...")
-    qa_careers_page.select_location_if_department_is_qa()
-    qa_careers_page.wait_for_job_cards_to_be_replaced()
-
-    qa_careers_page.wait_for_job_cards_to_load()
-    print("✅ İş ilanları doğrulanıyor...")
-    assert qa_careers_page.verify_job_listings(), "❌ Hata: İş ilanları kriterlere uymuyor!"
-
-    print("✅ View Role butonu kontrol ediliyor...")
-    assert qa_careers_page.verify_view_role_redirects(), "❌ Hata: View Role butonu yönlendirmiyor!"
-
-    print("🎉 Tüm testler başarıyla tamamlandı!")
-    print("🌐 Son URL:", driver.current_url)
-    
+        print("🎉 Test completed! ✅")

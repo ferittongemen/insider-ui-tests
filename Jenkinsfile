@@ -22,8 +22,7 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                sh '. $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore PYTHONPATH=. pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'
-            }
+                sh '. $VENV_DIR/bin/activate && PYTHONWARNINGS=ignore pytest --alluredir=allure-results --capture=tee-sys -p no:warnings'            }
         }
     }
 

@@ -1,116 +1,87 @@
-import time
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.wait import WebDriverWait
-
 from .base_page import BasePage
 
 class CareersPage(BasePage):
-    def __init__(self, driver):
-        """
-        CareersPage constructor.
-
-        :param driver: Selenium WebDriver instance
-
-        """
-        super().__init__(driver)
-        self.LOCATIONS_XPATH = "//*[@id='career-our-location']/div/div/div/div[1]"
-        self.TEAMS_PATH = "//*[@id='career-find-our-calling']/div/div/a"
-        self.life_at_insider_xpath = "//h2[contains(text(), 'Life at Insider')]"
-        self.see_all_teams_xpath = "//a[contains(text(), 'See all teams')]"
-        self.qa_careers_xpath = "//h3[contains(text(), 'Quality Assurance')]"
-        self.cookie_accept_id = "//*[@id='wt-cli-accept-all-btn']"
-        self.qa_open_positions_xpath = "//h3[contains(text(), 'Quality Assurance')]/following-sibling::a[contains(text(), 'Open Positions')]"
+    LOCATIONS_XPATH = "//*[@id='career-our-location']/div/div/div/div[1]"
+    TEAMS_PATH = "//*[@id='career-find-our-calling']/div/div/a"
+    LIFE_AT_INSIDER_XPATH = "//h2[contains(text(), 'Life at Insider')]"
+    SEE_ALL_TEAMS_XPATH = "//a[contains(text(), 'See all teams')]"
+    QA_CAREERS_XPATH = "//h3[contains(text(), 'Quality Assurance')]"
+    COOKIE_ACCEPT_ID = "//*[@id='wt-cli-accept-all-btn']"
+    QA_OPEN_POSITIONS_XPATH = "//h3[contains(text(), 'Quality Assurance')]/following-sibling::a[contains(text(), 'Open Positions')]"
 
     def is_accessible(self):
-        """
-        Verifies if the Careers page is accessible.
-
-        :return: True if title or URL contains career-related keywords, else False
-        :rtype: bool
-
-        """
         try:
-            print("🔍 QA sayfasının başlığı kontrol ediliyor...")
+            print("🔍 Checking QA page title...")
             self.wait_for_page_to_load()
             title = self.driver.title.lower()
             url = self.driver.current_url.lower()
-            print(f"📄 QA Sayfa Başlığı: {title}")
-            print(f"🌐 QA Sayfa URL: {url}")
+            print(f"📄 QA Page Title: {title}")
+            print(f"🌐 QA Page URL: {url}")
             return "careers" in title or "quality assurance" in title or "/careers" in url
         except Exception as e:
-            print(f"❌ QA sayfası erişim kontrolü sırasında hata: {e}")
+            print(f"❌ ERROR during accessibility check: {e}")
             return False
 
     def verify_sections(self):
-        """
-        Verifies the presence of key sections: Locations, Teams, and Life at Insider.
-
-        :return: True if all sections are found, else False
-        :rtype: bool
-
-        """
         try:
-            print("🔄 Bekleniyor: Locations bölümü...")
+            print("🔄 Waiting for Locations section...")
             self.wait_for_element(By.XPATH, self.LOCATIONS_XPATH)
-            print("✅ Locations bölümü bulundu!")
+            print("✅ Locations section found!")
 
-            print("🔄 Bekleniyor: Teams bölümü...")
+            print("🔄 Waiting for Teams section...")
             self.wait_for_element(By.XPATH, self.TEAMS_PATH)
-            print("✅ Teams bölümü bulundu!")
+            print("✅ Teams section found!")
 
-            self.wait_for_element(By.XPATH, self.life_at_insider_xpath)
-            print("✅ Life at Insider bölümü bulundu!")
+            self.wait_for_element(By.XPATH, self.LIFE_AT_INSIDER_XPATH)
+            print("✅ Life at Insider section found!")
 
             return True
         except Exception as e:
-            print(f"❌ HATA: Element bulunamadı: {e}")
+            print(f"❌ ERROR: Section not found: {e}")
             return False
 
     def go_to_qa_careers(self):
         """
         Navigates to the QA Careers page, using fallback methods if necessary.
-
         :raises Exception: If navigation fails
-        
         """
         try:
-            print("🔄 'See All Teams' butonu bekleniyor ve kaydırılıyor...")
-            see_all_teams_button = self.wait_for_element_to_be_clickable(By.XPATH, self.see_all_teams_xpath)
+            print("🔄 Scrolling to 'See All Teams' button...")
+            self.scroll_to_element(By.XPATH, self.SEE_ALL_TEAMS_XPATH)
 
-            self.scroll_to_element(By.XPATH, self.see_all_teams_xpath)
-            time.sleep(1)
-            self.scroll_to_element(By.XPATH, self.see_all_teams_xpath)
-            time.sleep(1)
+            # 🔁 Scroll sonrası tekrar clickable kontrolü yap
+            see_all_teams_button = self.wait_for_element_to_be_clickable(By.XPATH, self.SEE_ALL_TEAMS_XPATH)
+            if see_all_teams_button:
+                self.click_element(By.XPATH, self.SEE_ALL_TEAMS_XPATH)
+                print("✅ Clicked 'See All Teams'")
+            else:
+                print("❌ Could not click 'See All Teams'")
+                return
 
-            see_all_teams_button.click()
-            print("✅ 'See All Teams' butonuna tıklandı.")
-
-            print("🔄 Sayfanın tamamen yüklenmesi bekleniyor...")
+            print("🔄 Waiting for full page load...")
             self.wait_for_page_to_load()
-            time.sleep(2)
 
-            print("🔄 'QA Careers' butonu bekleniyor...")
-            self.scroll_to_element(By.XPATH, self.qa_careers_xpath)
-            time.sleep(1)
+            print("🔄 Waiting for 'QA Careers' section...")
+            self.scroll_to_element(By.XPATH, self.QA_CAREERS_XPATH)
+            qa_careers_section = self.wait_for_element(By.XPATH, self.QA_CAREERS_XPATH)
 
-            qa_careers_section = self.wait_for_element(By.XPATH, self.qa_careers_xpath)
-
-            qa_open_link = self.wait_for_element_to_be_clickable(By.XPATH, self.qa_open_positions_xpath)
+            qa_open_link = self.wait_for_element_to_be_clickable(By.XPATH, self.QA_OPEN_POSITIONS_XPATH)
 
             if qa_open_link:
-                print("🖱 'Open Positions' linkine tıklanıyor (workaround)...")
-                self.scroll_to_element(By.XPATH, self.qa_open_positions_xpath)
-                time.sleep(1)
+                print("🖱 Clicking 'Open Positions' link...")
+                self.scroll_to_element(By.XPATH, self.QA_OPEN_POSITIONS_XPATH)
                 qa_open_link.click()
-                print("✅ 'QA Careers' sayfasına geçildi (link ile).")
+                print("✅ Navigated to QA Careers via link.")
             else:
-                print("⚠️ Link bulunamadı, JavaScript ile başlığa tıklanıyor...")
+                print("⚠️ Link not found, using fallback JS click...")
                 self.driver.execute_script("arguments[0].click();", qa_careers_section)
-                print("✅ 'QA Careers' butonuna tıklandı (fallback).")
+                print("✅ Fallback click successful.")
 
+            # QA jobs yüklendi mi kontrol
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.XPATH, "//a[contains(text(), 'See all QA jobs')]"))
             )
+
         except Exception as e:
-            print(f"❌ HATA: 'QA Careers' sayfasına geçerken hata oluştu: {e}")
+            print(f"❌ ERROR while navigating to QA Careers page: {e}")

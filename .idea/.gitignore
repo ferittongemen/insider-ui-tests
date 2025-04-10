@@ -1,8 +1,33 @@
-# Default ignored files
+# PyCharm / IntelliJ
+.idea/
+*.iml
 /shelf/
 /workspace.xml
+
 # Editor-based HTTP Client requests
 /httpRequests/
-# Datasource local storage ignored files
+
+# Datasource local storage
 /dataSources/
 /dataSources.local.xml
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+
+# Test results & cache
+.pytest_cache/
+allure-results/
+allure-report/
+screenshots/
+
+# Ignore coverage / test result reports (if any)
+coverage.xml
+htmlcov/
+.cache/
